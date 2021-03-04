@@ -22,15 +22,24 @@ obj.upload_file('path completo(já pegado na variavel name)') #faz upload do arq
 
 client = Aws::Textract::Client.new({ #Faz uma conexão com a aws usando o Textract. Obs: só esta funcionando a região aplicada.
     region: 'us-west-2',
-    access_key_id: 'key',
-    secret_access_key: 'key'
+    access_key_id: ENV["KEY_ID"], #pedir a kei e criar variavel de ambiente
+    secret_access_key: ENV["KEY_ACCESS"] #pedir o acesso e criar variavel de ambiente
 })
 
-client.start_document_text_detection({ #inicia uma detecção assincrona e retorna um objeto job_id
+resposta = client.start_document_analysis({ #inicia uma detecção assincrona e retorna um objeto job_id
     document_location: { # required
       s3_object: {
-        bucket: "extrair",
-        name: "Curriculo_Samuel.pdf",
+        bucket: "extrair", #nome do bucket que será lido
+        name: "Curriculo_Samuel.pdf", #nome do arquivo que será lido
       }
-    }
+    },
+    feature_types: ["TABLES"] #o tipo do arquivo que será extraido no caso de pdf 'TABLES'
 })
+
+begin
+  resposta_get = client.get_document_analysis({ #analisa o job_id e retorna os dados
+    job_id: resposta[:job_id] # required
+  })
+end while(resposta_get[:job_status] == "IN_PROGRESS") #Fica lendo os dados até ele retorna que terminou
+
+puts resposta_get #Exibe os dados
