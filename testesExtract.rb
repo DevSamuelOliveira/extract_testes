@@ -42,4 +42,4 @@ begin
   })
 end while(resposta_get[:job_status] == "IN_PROGRESS") #Fica lendo os dados até ele retorna que terminou
 
-puts resposta_get #Exibe os dados
+puts resposta_get #Exibe os dados no formato de objeto HASH(chave, valor)
